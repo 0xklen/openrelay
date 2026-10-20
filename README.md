@@ -37,8 +37,9 @@ done.
 ## What it is
 
 - **Any model, any API** — one `config.yaml` entry per endpoint. OpenAI,
-  OpenRouter, Groq, Together, DeepSeek, an Anthropic proxy, or any
-  OpenAI-compatible self-host (Ollama, vLLM, llama.cpp, LM Studio).
+  DeepSeek, Groq, Together, OpenRouter, Mistral, xAI, native Anthropic,
+  native Gemini, or any OpenAI-compatible self-host (Ollama, vLLM,
+  llama.cpp, LM Studio).
 - **No limits in the wire** — nothing is filtered, nothing is logged, no
   refusals are injected, no policy or rate-limit layer. The relay is a
   transparent pipe.
@@ -47,6 +48,20 @@ done.
   (`uncensored: true`) route raw.
 - **Agent mode** — the model executes real shell / file / network / python
   commands until the task is finished.
+
+## Providers
+
+`provider` in `config.yaml` selects the request format. One client request is
+translated into each backend's native shape:
+
+| provider     | covers                                                                                 |
+| ------------ | -------------------------------------------------------------------------------------- |
+| `openai`     | DeepSeek, OpenAI, Groq, Together, OpenRouter, Mistral, xAI, Ollama, vLLM, llama.cpp, LM Studio — any OpenAI-compatible host (default) |
+| `anthropic`  | native Anthropic `/v1/messages` (Claude)                                               |
+| `gemini`     | native Google `/v1beta/models/...:generateContent`                                     |
+
+DeepSeek and every OpenAI-compatible endpoint work out of the box with
+`provider: openai` (the default) — no adapter needed, just a `base_url`.
 
 ## Quick start
 
@@ -197,10 +212,31 @@ never touch the file or the repo.
 
 </details>
 
+## MCP — use it from any agent
+
+OpenRelay ships an MCP server, so Hermes, Claude Code, Cursor, Codex, Gemini
+CLI and any MCP-speaking agent can call it directly as tools.
+
+```bash
+python mcp_server.py            # stdio MCP server
+```
+
+Register with Hermes:
+
+```bash
+hermes mcp add openrelay --command python --args /absolute/path/openrelay/mcp_server.py
+```
+
+Three tools: `chat` (raw answer, persona-injected), `task` (no-limits agent
+execution), `models` (list). Restart the agent and it can command any
+configured model — or hand it a task and it runs shell/files/network/python
+until done.
+
 ## Files
 
-- `relay.py` — registry, routing, persona injection, raw chat (the core)
+- `relay.py` — registry, routing, provider adapters, persona, raw chat (core)
 - `server.py` — FastAPI HTTP layer (`/v1/chat/completions`, `/v1/agent/run`)
+- `mcp_server.py` — MCP server (`chat`, `task`, `models`) for any agent
 - `agent.py` — the no-limits task agent (shell/files/network/python)
 - `persona.txt` — no-limits persona for chat
 - `agent_persona.txt` — agent system prompt (tool protocol)

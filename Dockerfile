@@ -3,7 +3,7 @@ FROM python:3.12-slim
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-COPY server.py relay.py agent.py persona.txt agent_persona.txt ./
+COPY server.py relay.py agent.py mcp_server.py persona.txt agent_persona.txt ./
 
 EXPOSE 8000
 CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]

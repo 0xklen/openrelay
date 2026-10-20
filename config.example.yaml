@@ -1,6 +1,12 @@
 # OpenRelay — model registry.
 # Add any model, any endpoint, any key. ${ENV} is expanded at load so keys
 # never sit in this file. Entries with the same `name` act as failover chain.
+#
+# `provider` selects the request format (default "openai" = OpenAI-compatible):
+#   openai     DeepSeek, Groq, Together, OpenRouter, Mistral, xAI, Ollama,
+#              vLLM, llama.cpp, LM Studio, and any OpenAI-compatible host
+#   anthropic  native Anthropic /v1/messages
+#   gemini     native Google /v1beta/models/...:generateContent
 
 models:
   # --- self-hosted uncensored weights (forward raw, nothing injected) ---
@@ -10,18 +16,33 @@ models:
     model: dolphin-mistral                      # abliterated/uncensored weight
     uncensored: true
 
-  # --- any hosted API behind a persona layer ---
+  # --- DeepSeek (OpenAI-compatible, persona-injected) ---
+  - name: deepseek
+    base_url: https://api.deepseek.com/v1
+    api_key: ${DEEPSEEK_API_KEY}
+    model: deepseek-chat
+
+  # --- any hosted OpenAI-compatible API behind a persona layer ---
   - name: openai
     base_url: https://api.openai.com/v1
     api_key: ${OPENAI_API_KEY}
     model: gpt-4o
 
-  - name: anthropic-proxy
-    base_url: http://localhost:9090/v1          # e.g. claude-code-router or a proxy
+  # --- native Anthropic (Claude) ---
+  - name: claude
+    base_url: https://api.anthropic.com
     api_key: ${ANTHROPIC_API_KEY}
     model: claude-sonnet-4
+    provider: anthropic
 
-  # --- any OpenAI-compatible provider: Groq, Together, OpenRouter, DeepSeek, ... ---
+  # --- native Google Gemini ---
+  - name: gemini
+    base_url: https://generativelanguage.googleapis.com
+    api_key: ${GEMINI_API_KEY}
+    model: gemini-2.0-flash
+    provider: gemini
+
+  # --- any OpenAI-compatible provider: Groq, Together, OpenRouter, ... ---
   - name: openrouter
     base_url: https://openrouter.ai/api/v1
     api_key: ${OPENROUTER_API_KEY}
