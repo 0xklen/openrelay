@@ -21,8 +21,9 @@ import re
 import httpx
 import yaml
 
-CONFIG_PATH = os.environ.get("OPENRELAY_CONFIG", "config.yaml")
-PERSONA_PATH = os.environ.get("OPENRELAY_PERSONA", "persona.txt")
+_BASE = os.path.dirname(os.path.abspath(__file__))
+CONFIG_PATH = os.environ.get("OPENRELAY_CONFIG", os.path.join(_BASE, "config.yaml"))
+PERSONA_PATH = os.environ.get("OPENRELAY_PERSONA", os.path.join(_BASE, "persona.txt"))
 
 models = []
 

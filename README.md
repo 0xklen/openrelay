@@ -214,22 +214,45 @@ never touch the file or the repo.
 
 ## MCP — use it from any agent
 
-OpenRelay ships an MCP server, so Hermes, Claude Code, Cursor, Codex, Gemini
-CLI and any MCP-speaking agent can call it directly as tools.
+OpenRelay ships a stdio MCP server (`mcp_server.py`) with three tools — `chat`,
+`task`, `models`. It is self-contained: the config and personas are resolved
+next to the script, so any agent can launch it from anywhere with no env vars.
 
 ```bash
-python mcp_server.py            # stdio MCP server
+python /absolute/path/openrelay/mcp_server.py     # stdio MCP server
 ```
 
-Register with Hermes:
+`python` needs the mcp SDK (`pip install -r requirements.txt`). Point the
+agent's MCP config at that command; the absolute path is the only thing that
+matters.
 
-```bash
-hermes mcp add openrelay --command python --args /absolute/path/openrelay/mcp_server.py
+| Agent          | Register                                                            |
+| -------------- | ------------------------------------------------------------------- |
+| Hermes         | `hermes mcp add openrelay --command python --args /abs/path/mcp_server.py` |
+| Claude Code    | `claude mcp add openrelay -- python /abs/path/mcp_server.py`        |
+| Codex          | `codex mcp add openrelay -- python /abs/path/mcp_server.py`         |
+| OpenCode       | `opencode mcp add openrelay -- python /abs/path/mcp_server.py`      |
+| Cursor         | Settings → Features → MCP → add (or `~/.cursor/mcp.json`)           |
+| Claude Desktop | Settings → Developer → Edit Config → `claude_desktop_config.json`   |
+| Gemini CLI     | `~/.gemini/settings.json`                                           |
+| VS Code Copilot| `~/.copilot/mcp-config.json`                                        |
+
+For the GUI-based agents (Cursor, Claude Desktop, Gemini, VS Code), the entry
+is the same everywhere:
+
+```json
+{
+  "mcpServers": {
+    "openrelay": {
+      "command": "python",
+      "args": ["/absolute/path/openrelay/mcp_server.py"]
+    }
+  }
+}
 ```
 
-Three tools: `chat` (raw answer, persona-injected), `task` (no-limits agent
-execution), `models` (list). Restart the agent and it can command any
-configured model — or hand it a task and it runs shell/files/network/python
+Restart the agent after registering. Then it can command any configured model
+through `chat`, or hand `task` a job and it runs shell/files/network/python
 until done.
 
 ## Files

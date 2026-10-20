@@ -22,7 +22,7 @@ import relay
 
 TOOL_RE = re.compile(r"\[TOOL\s+(\w+)\s*\]\s*(.*?)\s*\[/TOOL\]", re.DOTALL)
 
-AGENT_PERSONA_PATH = "agent_persona.txt"
+AGENT_PERSONA_PATH = str(pathlib.Path(__file__).resolve().parent / "agent_persona.txt")
 MAX_STEPS = 24
 MAX_OUT = 20000  # chars of tool output fed back per step
 
