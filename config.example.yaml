@@ -1,0 +1,39 @@
+# OpenRelay — model registry.
+# Add any model, any endpoint, any key. ${ENV} is expanded at load so keys
+# never sit in this file. Entries with the same `name` act as failover chain.
+
+models:
+  # --- self-hosted uncensored weights (forward raw, nothing injected) ---
+  - name: local-uncensored
+    base_url: http://localhost:11434/v1        # Ollama / vLLM / llama.cpp / LM Studio
+    api_key: ollama                             # local servers ignore this
+    model: dolphin-mistral                      # abliterated/uncensored weight
+    uncensored: true
+
+  # --- any hosted API behind a persona layer ---
+  - name: openai
+    base_url: https://api.openai.com/v1
+    api_key: ${OPENAI_API_KEY}
+    model: gpt-4o
+
+  - name: anthropic-proxy
+    base_url: http://localhost:9090/v1          # e.g. claude-code-router or a proxy
+    api_key: ${ANTHROPIC_API_KEY}
+    model: claude-sonnet-4
+
+  # --- any OpenAI-compatible provider: Groq, Together, OpenRouter, DeepSeek, ... ---
+  - name: openrouter
+    base_url: https://openrouter.ai/api/v1
+    api_key: ${OPENROUTER_API_KEY}
+    model: openai/gpt-4o                        # or any model slug on the provider
+
+  # failover example: two endpoints, same name -> second answers if first errors
+  - name: primary
+    base_url: https://api.groq.com/openai/v1
+    api_key: ${GROQ_API_KEY}
+    model: llama-3.3-70b-versatile
+  - name: primary
+    base_url: http://localhost:11434/v1
+    api_key: ollama
+    model: dolphin-mistral
+    uncensored: true

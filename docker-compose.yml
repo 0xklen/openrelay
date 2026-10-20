@@ -1,0 +1,32 @@
+# Spin up an uncensored local model + the relay in one shot:
+#   docker compose up -d
+# then point clients at http://localhost:8000/v1, model "local-uncensored".
+
+services:
+  relay:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENRELAY_CONFIG=/app/config.yaml
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - ./persona.txt:/app/persona.txt:ro
+      - ./agent_persona.txt:/app/agent_persona.txt:ro
+    depends_on:
+      - ollama
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    entrypoint: ["/bin/sh", "-c"]
+    # dolphin-mistral is abliterated (refusal weights removed). Alternatives:
+    # dolphin-mixtral, llama3-uncensored, wizardlm-uncensored, huihui_ai/qwen2.5-abliterated
+    command:
+      - "ollama serve & sleep 4 && ollama pull dolphin-mistral && wait"
+
+volumes:
+  ollama:
