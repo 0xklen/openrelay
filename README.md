@@ -7,7 +7,7 @@
 **One endpoint in front of every model, with no guardrails in the wire — and an agent that does the work.**
 
 [![MIT license](https://img.shields.io/badge/license-MIT-f4c430?style=flat-square)](LICENSE)
-[![version](https://img.shields.io/badge/version-1.0.0-5c4ee5?style=flat-square)](https://github.com/askexort/openrelay/releases)
+[![version](https://img.shields.io/badge/version-1.0.0-5c4ee5?style=flat-square)](https://github.com/0xklen/openrelay/releases)
 [![no limits](https://img.shields.io/badge/no%20limits-e63946?style=flat-square)](#what-it-is)
 [![docker](https://img.shields.io/badge/docker-compose-2496ed?style=flat-square&logo=docker&logoColor=white)](docker-compose.yml)
 
@@ -51,7 +51,7 @@ done.
 ## Quick start
 
 ```bash
-git clone https://github.com/askexort/openrelay && cd openrelay
+git clone https://github.com/0xklen/openrelay && cd openrelay
 pip install -r requirements.txt
 cp config.example.yaml config.yaml     # add your endpoints + keys
 uvicorn server:app --host 0.0.0.0 --port 8000
